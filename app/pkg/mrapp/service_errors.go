@@ -1,23 +1,21 @@
 package mrapp
 
-import "errors"
-
 var (
     ErrServiceResourceTemporarilyUnavailable = NewError(
-        "errServiceResourceTemporarilyUnavailable", errors.New("resource is temporarily unavailable"), ErrorKindUser)
+        "errServiceResourceTemporarilyUnavailable", ErrorKindSystem, "resource is temporarily unavailable")
 
     ErrServiceResourceNotFound = NewError(
-        "errServiceResourceNotFound", errors.New("resource is not found"), ErrorKindUser)
+        "errServiceResourceNotFound", ErrorKindUser, "resource is not found")
 
-    ErrServiceResourceNotCreated = NewError(
-        "errServiceResourceNotCreated", errors.New("resource is not created"), ErrorKindUser)
+    ErrServiceResourceNotCreated = NewError( // arg1=resourceName
+        "errServiceResourceNotCreated", ErrorKindSystem, "resource is not created")
 
     ErrServiceResourceNotUpdated = NewError(
-        "errServiceResourceNotUpdated", errors.New("resource is not updated"), ErrorKindUser)
+        "errServiceResourceNotUpdated", ErrorKindSystem, "resource is not updated")
 
     ErrServiceResourceNotRemoved = NewError(
-        "errServiceResourceNotRemoved", errors.New("resource is not removed"), ErrorKindUser)
+        "errServiceResourceNotRemoved", ErrorKindSystem, "resource is not removed")
 
     ErrServiceIncorrectData = NewError(
-        "errServiceIncorrectData", errors.New("data is incorrect"), ErrorKindUser)
+        "errServiceIncorrectData", ErrorKindSystem, "data is incorrect")
 )

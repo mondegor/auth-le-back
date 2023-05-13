@@ -38,7 +38,7 @@ func main() {
         mrlib.TranslatorOptions{
             DirPath: cfg.Translation.DirPath,
             FileType: cfg.Translation.FileType,
-            LangCodes: mrapp.LangCodes.Convert(cfg.Translation.LangCodes),
+            LangCodes: mrapp.CastToLangCodes(cfg.Translation.LangCodes...),
         },
     )
 

@@ -6,6 +6,5 @@ import (
 )
 
 func (c *Connection) debugQuery(query string) {
-    query = strings.ReplaceAll(strings.ReplaceAll(query, "\t", ""), "\n", " ")
-    c.logger.Debug(fmt.Sprintf("SQL Query: %s", query))
+    c.logger.Debug(fmt.Sprintf("SQL Query: %s", strings.Join(strings.Fields(query), " ")))
 }

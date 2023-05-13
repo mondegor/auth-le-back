@@ -1,10 +1,13 @@
 package mrapp
 
+import (
+    "strings"
+)
+
 type (
     LangCode string // ISO 639 and regions
     LangCodes []LangCode
     MessageCode string
-    ErrorCode string
 
     ErrorMessage struct {
         Reason string `yaml:"reason"`
@@ -22,7 +25,18 @@ type Locale interface {
     GetError(errorCode ErrorCode) ErrorMessage
 }
 
-func (l LangCodes) Convert(langs ...string) LangCodes {
+func (em *ErrorMessage) GetDetails() string {
+    switch len(em.Details) {
+        case 0:
+            return ""
+        case 1:
+            return em.Details[0]
+    }
+
+    return "- " + strings.Join(em.Details, "\n- ")
+}
+
+func CastToLangCodes(langs ...string) LangCodes {
     var langCodes LangCodes
 
     for _, lang := range langs {

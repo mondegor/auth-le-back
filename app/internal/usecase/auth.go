@@ -4,7 +4,6 @@ import (
     "auth-le-back/internal/entity"
     "auth-le-back/pkg/mrapp"
     "context"
-    "fmt"
 )
 
 type Auth struct {
@@ -25,22 +24,21 @@ func (a *Auth) CreateAccount(ctx context.Context, item entity.AccountUser) (enti
     userId, err := a.user.GetIdByEmail(ctx, item.User.Email)
 
     if err != nil {
-        return "", err
+        return "", mrapp.ErrServiceResourceTemporarilyUnavailable.Wrap(err)
     }
 
     if userId > 0 {
-        err = fmt.Errorf("Email '%s' is already exists", item.User.Email)
-        return "", AuthErrUserEmailAlreadyExists.Wrap(err)
+        return "", ErrAuthUserEmailAlreadyExists.New(item.User.Email)
     }
 
-    errors.Add("userEmail", "Email '%s' is already exists", item.User.Email)
-    AuthErrUserEmailAlreadyExists
+    item.Account.Status = entity.AccountStatusActivating
 
+    a.logger.Info("account.Create: %s", item.User.Email)
 
     err = a.account.Create(ctx, &item)
 
     if err != nil {
-        return "", err
+        return "", mrapp.ErrServiceResourceNotCreated.Wrap(err)
     }
 
     return item.Account.Id, nil

@@ -2,12 +2,20 @@ package mrapp
 
 import "fmt"
 
-type ErrorAttribute struct {
-    Id string `json:"id"`
-    Value string `json:"value"`
-}
+type (
+    ErrorAttribute struct {
+        Id string `json:"id"`
+        Value string `json:"value"`
+    }
 
-type ErrorList []ErrorAttribute
+    ErrorList []ErrorAttribute
+
+    ValidatorTagFunc func() any
+)
+
+func (e *ErrorList) Error() string {
+    return fmt.Sprintf("%+v", *e)
+}
 
 func (e *ErrorList) Add(id, value string, args ...any) {
     if len(args) > 0 {
@@ -18,5 +26,6 @@ func (e *ErrorList) Add(id, value string, args ...any) {
 }
 
 type Validator interface {
-    Validate(structure any, errors *ErrorList) bool
+    Register(tag string, fn ValidatorTagFunc)
+    Validate(structure any) error
 }

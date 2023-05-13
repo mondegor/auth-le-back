@@ -3,6 +3,7 @@ package app
 
 import (
     "auth-le-back/config"
+    "auth-le-back/internal/controller/dto"
     "auth-le-back/internal/controller/http_v1"
     "auth-le-back/internal/infrastructure/repository"
     "auth-le-back/internal/usecase"
@@ -47,8 +48,10 @@ func Run(cfg *config.Config, logger mrapp.Logger, translator mrapp.Translator) {
     authService := usecase.NewAuth(logger, accountStorage, userStorage)
 
     requestValidator := mrlib.NewValidator(logger)
+    requestValidator.Register("login", dto.ValidateLogin)
 
     authHttp := http_v1.NewAuth(logger, requestValidator, authService)
+    authCheckHttp := http_v1.NewAuthCheck(logger, requestValidator, authService)
 
     logger.Info("Create router")
 
@@ -68,7 +71,7 @@ func Run(cfg *config.Config, logger mrapp.Logger, translator mrapp.Translator) {
         mrhttp.MiddlewareAuthenticateUser(logger),
     )
 
-    router.Register(authHttp)
+    router.Register(authHttp, authCheckHttp)
     router.HandlerFunc(http.MethodGet, "/", MainPage)
 
     appStart(cfg, logger, router)

@@ -5,7 +5,12 @@ import (
     "fmt"
     "log"
     "os"
-    "strings"
+    "runtime"
+    "time"
+)
+
+const (
+    datetime = "2006/01/02 15:04:05"
 )
 
 type Logger struct {
@@ -21,8 +26,8 @@ var _ mrapp.Logger = (*Logger)(nil)
 func NewLogger(level string, color bool) *Logger {
     lvl := mrapp.ParseLogLevel(level)
 
-    infoLog := log.New(os.Stdout, "", log.Ldate | log.Ltime)
-    errLog := log.New(os.Stderr, "", log.Ldate | log.Ltime | log.Lshortfile)
+    infoLog := log.New(os.Stdout, "", 0)
+    errLog := log.New(os.Stderr, "", 0)
 
     return &Logger {
         level: lvl,
@@ -33,58 +38,81 @@ func NewLogger(level string, color bool) *Logger {
 }
 
 func (l *Logger) Fatal(message any, args ...any) {
+    var buf []byte
+
+    l.formatHeader(&buf, "FATAL", 2)
+    l.formatMessage(&buf, message)
+
     if len(args) == 0 {
-        l.errLog.Fatal(getPrefix("fatal"), getMessage(message))
+        l.errLog.Fatal(string(buf))
     } else {
-        l.errLog.Fatalf(getPrefix("fatal") + getMessage(message), args...)
+        l.errLog.Fatalf(string(buf), args...)
     }
 }
 
 func (l *Logger) Error(message any, args ...any) {
     if l.level >= mrapp.LogErrorLevel {
-        logPrint(l.errLog, "error", message, args)
+        l.logPrint(l.errLog, 3,"ERROR", message, args)
     }
 }
 
 func (l *Logger) Warn(message string, args ...any) {
     if l.level >= mrapp.LogWarnLevel {
-        logPrint(l.infoLog, "warn", message, args)
+        l.logPrint(l.infoLog, 3,"WARN", message, args)
     }
 }
 
 func (l *Logger) Info(message string, args ...any) {
     if l.level >= mrapp.LogInfoLevel {
-        logPrint(l.infoLog, "info", message, args)
+        l.logPrint(l.infoLog, 0,"INFO", message, args)
     }
 }
 
 func (l *Logger) Debug(message any, args ...any) {
     if l.level >= mrapp.LogDebugLevel {
-        logPrint(l.infoLog, "debug", message, args)
+        l.logPrint(l.infoLog, 0, "DEBUG", message, args)
     }
 }
 
-func getPrefix(prefix string) string {
-    return strings.ToUpper(prefix) + "\t"
+func (l *Logger) logPrint(logger *log.Logger, calldepth int, prefix string, message any, args []any) {
+    var buf []byte
+
+    l.formatHeader(&buf, prefix, calldepth)
+    l.formatMessage(&buf, message)
+
+    if len(args) == 0 {
+        logger.Print(string(buf))
+    } else {
+        logger.Printf(string(buf), args...)
+    }
 }
 
-func getMessage(message any) string {
+func (l *Logger) formatHeader(buf *[]byte, prefix string, calldepth int) {
+    *buf = append(*buf, time.Now().Format(datetime)...)
+    *buf = append(*buf, ' ')
+
+    if calldepth > 0 {
+        _, file, line, ok := runtime.Caller(calldepth)
+
+        if !ok {
+            file = "???"
+            line = 0
+        }
+
+        *buf = append(*buf, fmt.Sprintf("%s:%d ", file, line)...)
+    }
+
+    *buf = append(*buf, prefix...)
+    *buf = append(*buf, '\t')
+}
+
+func (l *Logger) formatMessage(buf *[]byte, message any) {
     switch msg := message.(type) {
         case error:
-            return msg.Error()
+            *buf = append(*buf, msg.Error()...)
         case string:
-            return msg
+            *buf = append(*buf, msg...)
         default:
-            return fmt.Sprintf("Message %v has unknown type %v", message, msg)
+            *buf = append(*buf, fmt.Sprintf("Message %v has unknown type %v", message, msg)...)
     }
 }
-
-func logPrint(logger *log.Logger, prefix string, message any, args []any) {
-    if len(args) == 0 {
-        logger.Print(getPrefix(prefix), getMessage(message))
-    } else {
-        logger.Printf(getPrefix(prefix) + getMessage(message), args...)
-    }
-}
-
-

@@ -1,22 +1,34 @@
 package usecase
 
 import (
+    "auth-le-back/pkg/mrapp"
     "context"
-    "fmt"
-    "net/mail"
-    "regexp"
 )
 
-func (a *Auth) IsLoginAlreadyExist(ctx context.Context, login string) error {
-    if _, err := mail.ParseAddress(login); err == nil {
-        return a.user.IsEmailExists(ctx, login)
+func (a *Auth) CheckIfLoginIsFree(ctx context.Context, login string) error {
+    userId, err := a.user.GetIdByEmail(ctx, login)
+
+    if err != nil {
+        return mrapp.ErrServiceResourceTemporarilyUnavailable.Wrap(err)
     }
 
-
-
-    if ok, _ := regexp.MatchString("^[a-z][a-z0-9]*$", login); ok == true {
-        return a.user.IsLoginExists(ctx, login)
+    if userId > 0 {
+        return ErrAuthUserLoginAlreadyExists.New(login)
     }
 
-    return true, fmt.Errorf("Login is incorrect")
+    return nil
+}
+
+func (a *Auth) CheckIfEmailIsFree(ctx context.Context, email string) error {
+    userId, err := a.user.GetIdByEmail(ctx, email)
+
+    if err != nil {
+        return mrapp.ErrServiceResourceTemporarilyUnavailable.Wrap(err)
+    }
+
+    if userId > 0 {
+        return ErrAuthUserEmailAlreadyExists.New(email)
+    }
+
+    return nil
 }

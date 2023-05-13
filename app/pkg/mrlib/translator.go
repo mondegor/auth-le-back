@@ -103,5 +103,5 @@ func (l Locale) GetError(errorCode mrapp.ErrorCode) mrapp.ErrorMessage {
         return value
     }
 
-    return mrapp.ErrorMessage{} // stub
+    return mrapp.ErrorMessage{Reason: string(errorCode)} // stub
 }

@@ -3,19 +3,41 @@ messages:
   myMessage: This is my message
 
 errors:
-  authErrUserEmailAlreadyExists:
+  errSystem:
+    reason: System server error (ru)
+    details:
+      - Contact support in telegram (ru)
+
+  errInternal:
+    reason: Internal server error (ru)
+    details:
+      - Contact support in telegram (ru)
+
+  errHttpRequestParseData:
+    reason: Request body is not valid (ru)
+    details:
+      - Check fields REST API endpoint (ru)
+
+  errAuthUserEmailAlreadyExists:
     reason: Емаил '%s' уже существует
     details:
       - DDDDD1
       - DDDDD2
-  authErrUserEmailAlreadyExists2:
+
+  errAuthUserEmailAlreadyExists2:
     reason: Емаил '%s' уже существует2
     details:
       - XXXXXXXXX1
       - XXXXXXXXX2
       - XXXXXXXXX3
-  authErrUserEmailAlreadyExists3:
+
+  errAuthUserEmailAlreadyExists3:
     reason: Емаил '%s' уже существует3
     details: [ MMMMMMMMM ]
-  authErrUserEmailAlreadyExistsWithoutDetails:
+
+  errAuthUserEmailAlreadyExistsWithoutDetails:
     reason: Емаил '%s' уже существует4
+
+  errServiceResourceTemporarilyUnavailable:
+    reason: Ресурс сервиса временно не доступен
+    details: [ detail1, detail2 ]

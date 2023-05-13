@@ -2,7 +2,6 @@ package mrlib
 
 import (
     "auth-le-back/pkg/mrapp"
-    "fmt"
     "reflect"
     "strings"
 
@@ -35,27 +34,35 @@ func NewValidator(logger mrapp.Logger) *Validator {
     }
 }
 
-func (v *Validator) Validate(structure any, errors *mrapp.ErrorList) bool {
+func (v *Validator) Register(tag string, fn mrapp.ValidatorTagFunc) {
+    var err error
+
+    if vfn, ok := fn().(func (fl validator.FieldLevel) bool); ok {
+        err = v.validate.RegisterValidation(tag, vfn)
+
+        if err != nil {
+            v.logger.Error(err)
+        }
+    } else {
+        v.logger.Error(mrapp.ErrInternalTypeAssertion)
+    }
+}
+
+func (v *Validator) Validate(structure any) error {
     err := v.validate.Struct(structure)
 
     if err == nil {
-        return true
+        return nil
     }
 
     if _, ok := err.(*validator.InvalidValidationError); ok {
-        v.logger.Error(err)
-        return false
+        return mrapp.ErrInternal.Wrap(err)
     }
 
-    isValid := true
+    errors := &mrapp.ErrorList{}
 
     for _, errField := range err.(validator.ValidationErrors) {
-        *errors = append(*errors, mrapp.ErrorAttribute{
-            Id: errField.Field(),
-            Value: fmt.Sprintf("Cause of error: %s", errField.Tag()),
-        })
-
-        isValid = false
+        errors.Add(errField.Field(), "Cause of error: %s", errField.Tag())
 
         v.logger.Debug(
             "Namespace: %s\n" +
@@ -81,5 +88,5 @@ func (v *Validator) Validate(structure any, errors *mrapp.ErrorList) bool {
         )
     }
 
-    return isValid
+    return errors
 }

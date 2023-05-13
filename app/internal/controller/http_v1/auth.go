@@ -46,35 +46,35 @@ func (a *Auth) Signup() mrapp.HttpHandlerFunc {
 
     return func(w http.ResponseWriter, r *http.Request) error {
         request := CreateAccount{}
-        errors := &mrapp.ErrorList{}
 
         if err := mrhttp.BindJSON(r, &request); err != nil {
             return err
         }
 
-        if a.validator.Validate(request, errors) {
-            if _, err := a.auth.CreateAccount(
-                r.Context(),
-                entity.AccountUser{
-                    User: entity.User{Email: request.UserEmail},
-                }); err != nil {
-
-                return err
-            }
-
-            // todo operationToken, accountId, message
-            return mrhttp.SendResponseSuccessNoBody(w)
+        if err := a.validator.Validate(request); err != nil {
+            return err
         }
 
-        return mrhttp.SendResponseError400(w, errors)
+        accountId, err := a.auth.CreateAccount(
+            r.Context(),
+            entity.AccountUser{
+                User: entity.User{Email: request.UserEmail},
+            })
+
+        if err != nil {
+            return err
+        }
+
+        // todo operationToken, accountId, message
+        return mrhttp.SendResponse(w, http.StatusCreated, accountId)
     }
 }
 
 func (a *Auth) Signin(w http.ResponseWriter, r *http.Request) error {
 
-    response := &mrhttp.AppError400Response{}
-    response.AddError("ff", "dddddd")
-    response.AddError("ff1", "dddddd2")
+    response := &mrapp.ErrorList{}
+    response.Add("ff", "dddddd")
+    response.Add("ff1", "dddddd2")
 
     w.WriteHeader(http.StatusBadRequest)
 

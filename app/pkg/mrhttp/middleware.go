@@ -20,22 +20,26 @@ type RequestHeaders struct {
     Platform string
 }
 
-func (rt *Router) MiddlewareLast(h mrapp.HttpHandlerFunc) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (rt *Router) MiddlewareLast(h mrapp.HttpHandlerFunc) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        var err error
         w.Header().Set("Content-Type", "application/json")
 
-        rh, _ := r.Context().Value(ctxKeyHeadersID).(RequestHeaders)
-        rt.logger.Info("MESSAGE-language: %s", rh.Locale.GetCode())
-        rt.logger.Info("MESSAGE-correlationId: %s", rh.CorrelationId)
+        rh, ok := r.Context().Value(ctxKeyHeadersID).(RequestHeaders)
 
-        err := h(w, r)
+        if ok {
+            err = h(w, r)
+        } else {
+            err = mrapp.ErrInternalTypeAssertion
+        }
 
         if err != nil {
+            rt.logger.Info("MiddlewareLast:ERROR")
             rt.logger.Error(err)
 
-            SendResponseError(w, r, err)
+            SendResponseError(w, r, &rh, err)
         }
-    })
+    }
 }
 
 func MiddlewareHeaders(logger mrapp.Logger, translator mrapp.Translator) mrapp.HttpMiddleware {
@@ -47,17 +51,20 @@ func MiddlewareHeaders(logger mrapp.Logger, translator mrapp.Translator) mrapp.H
 
             rh := RequestHeaders{Platform: PlatformWeb}
 
-            if r.Header.Get("Accept-Language") != "" {
-                rh.Locale = translator.GetLocaleByAcceptLanguage(r.Header.Get("Accept-Language"))
-            }
+            acceptLanguage := r.Header.Get("Accept-Language")
+            rh.Locale = translator.GetLocaleByAcceptLanguage(acceptLanguage)
+            logger.Debug("Accept-Language: %s; Set-Language: %s", acceptLanguage, rh.Locale.GetCode())
 
             if r.Header.Get("CorrelationID") != "" {
                 rh.CorrelationId = r.Header.Get("CorrelationID")
+                logger.Debug("CorrelationID: %s", rh.CorrelationId)
             }
 
             if r.Header.Get("Platform") == PlatformMobile {
                 rh.Platform = PlatformMobile
             }
+
+            logger.Debug("Platform: %s", rh.Platform)
 
             next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyHeadersID, rh)))
         })
@@ -70,12 +77,6 @@ func MiddlewareAuthenticateUser(logger mrapp.Logger) mrapp.HttpMiddleware {
 
         return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
             logger.Debug("Exec MiddlewareAuthenticateUser")
-
-            //if len(p) > 0 {
-            //    ctx := req.Context()
-            //    ctx = context.WithValue(ctx, ParamsKey, p)
-            //    req = req.WithContext(ctx)
-            //}
 
             next.ServeHTTP(w, r)
         })

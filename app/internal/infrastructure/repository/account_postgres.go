@@ -54,16 +54,14 @@ func (a *Account) Create(ctx context.Context, row *entity.AccountUser) error {
             (datetime_created, account_status, datetime_status)
         VALUES
             (NOW(), $1, NOW())
-        RETURNING account_id, datetime_created, datetime_status;`
+        RETURNING account_id, datetime_created;`
 
 	err := a.QueryRow(
 	    ctx,
 		sql,
-		row.Status,
         entity.AccountStatusActivating).Scan(
-            &row.Id,
-            &row.CreatedAt,
-            &row.ChangedAt)
+            &row.Account.Id,
+            &row.Account.CreatedAt)
 
     return err
 }

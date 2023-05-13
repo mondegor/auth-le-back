@@ -15,9 +15,7 @@ func (c *Connection) wrapError(err error) error {
         return mrapp.ErrStorageQueryFailed.Wrap(err)
     }
 
-    errorMessage := err.Error()
-
-    if errorMessage == "no rows in result set" {
+    if err.Error() == "no rows in result set" {
         return mrapp.ErrStorageNoRowFound.Wrap(err)
     }
 

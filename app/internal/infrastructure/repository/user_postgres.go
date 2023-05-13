@@ -5,6 +5,7 @@ import (
     "auth-le-back/pkg/client/postgresql"
     "auth-le-back/pkg/mrapp"
     "context"
+    "errors"
 )
 
 type User struct {
@@ -147,6 +148,10 @@ func (a *User) GetIdByEmail(ctx context.Context, email string) (entity.UserPrima
     var userId entity.UserPrimaryKey
 
     err := a.QueryRow(ctx, sql, email).Scan(&userId)
+
+    if err != nil && errors.Is(err, mrapp.ErrStorageNoRowFound) {
+        return 0, nil
+    }
 
     return userId, err
 }

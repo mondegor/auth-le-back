@@ -23,7 +23,8 @@ type (
     }
 
     AuthCheckService interface {
-        IsLoginAlreadyExist(ctx context.Context, login string) error
+        CheckIfLoginIsFree(ctx context.Context, login string) error
+        CheckIfEmailIsFree(ctx context.Context, email string) error
     }
 
     AccountStorage interface {
@@ -34,6 +35,15 @@ type (
        Delete(ctx context.Context, id entity.AccountPrimaryKey) error
        GetAccountInfo(ctx context.Context, id entity.AccountPrimaryKey) (*entity.AccountUser, error)
     }
+
+    //ActivationStorage interface {
+    //    FindOne(ctx context.Context, id entity.AccountPrimaryKey) (*entity.Account, error)
+    //    IsExists(ctx context.Context, id entity.AccountPrimaryKey) (bool, error)
+    //    Create(ctx context.Context, row *entity.User) error
+    //    Update(ctx context.Context, row *entity.Account) error
+    //    Delete(ctx context.Context, id entity.AccountPrimaryKey) error
+    //    GetAccountInfo(ctx context.Context, id entity.AccountPrimaryKey) (*entity.AccountUser, error)
+    //}
 
     UserStorage interface {
         FindOne(ctx context.Context, id entity.UserPrimaryKey) (*entity.User, error)

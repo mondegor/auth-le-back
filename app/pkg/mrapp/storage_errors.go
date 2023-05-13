@@ -1,20 +1,18 @@
 package mrapp
 
-import "errors"
-
 var (
     ErrStorageConnectionAlreadyExists = NewError(
-        "errStorageConnectionAlreadyExists", errors.New("connection already exists"), ErrorKindSystem)
+        "errStorageConnectionAlreadyExists", ErrorKindSystem, "connection already exists")
 
     ErrStorageConnectionFailed = NewError(
-        "errStorageConnectionFailed", errors.New("connection is failed"), ErrorKindSystem)
+        "errStorageConnectionFailed", ErrorKindSystem, "connection is failed")
 
     ErrStorageQueryFailed = NewError(
-        "errStorageQueryFailed", errors.New("query is failed"), ErrorKindInternal)
+        "errStorageQueryFailed", ErrorKindInternal, "query is failed")
 
     ErrStorageFetchDataFailed = NewError(
-        "errStorageFetchDataFailed", errors.New("fetching data is failed"), ErrorKindInternal)
+        "errStorageFetchDataFailed", ErrorKindInternal, "fetching data is failed")
 
     ErrStorageNoRowFound = NewError(
-        "errStorageNoRowFound", errors.New("no row found"), ErrorKindSystem)
+        "errStorageNoRowFound", ErrorKindUser, "no row found")
 )

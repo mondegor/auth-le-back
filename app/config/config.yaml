@@ -38,7 +38,7 @@ cors:
   allow_credentials: true
 
 translation:
-  dir_path: ./locale
+  dir_path: ./translate
   file_type: yaml
   lang_codes: # the first language is used as fallback
     - en
