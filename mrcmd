@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# chmod +x ./mrcmd
+
+./../mrcmd/mrcmd -d deploy --env-file ./.env "$@"

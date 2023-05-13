@@ -1,0 +1,45 @@
+---
+app_path:
+debug: true
+
+logger:
+  level: debug
+  no_color: true
+
+listen:
+  type: port
+  sock_name: app.sock
+  bind_ip: 0.0.0.0
+  port: 8090
+
+storage:
+  type: postgres
+  host: localhost
+  port: 5432
+  username: sx_user
+  password: 12345
+  database: sx_db
+  timeout: 5
+
+cors:
+  allowed_origins:
+    - http://localhost:8083
+    - http://127.0.0.1:8090
+    - http://localhost:3000
+    - http://127.0.0.1:3000
+  allowed_methods:
+    - GET
+    - POST
+    - PATCH
+    - DELETE
+  allowed_headers:
+    - Content-Type
+  # exposed_headers:
+  allow_credentials: true
+
+translation:
+  dir_path: ./locale
+  file_type: yaml
+  lang_codes: # the first language is used as fallback
+    - en
+    - ru

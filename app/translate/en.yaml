@@ -1,0 +1,21 @@
+---
+messages:
+  myMessage: This is my message
+
+errors:
+  authErrUserEmailAlreadyExists:
+    reason: Email '%s' is already exists
+    details:
+      - DDDDD1
+      - DDDDD2
+  authErrUserEmailAlreadyExists2:
+    reason: Email '%s' is already exists2
+    details:
+      - XXXXXXXXX1
+      - XXXXXXXXX2
+      - XXXXXXXXX3
+  authErrUserEmailAlreadyExists3:
+    reason: Email '%s' is already exists3
+    details: [ MMMMMMMMM ]
+  authErrUserEmailAlreadyExistsWithoutDetails:
+    reason: Email '%s' is already exists4

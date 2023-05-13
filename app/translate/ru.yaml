@@ -1,0 +1,21 @@
+---
+messages:
+  myMessage: This is my message
+
+errors:
+  authErrUserEmailAlreadyExists:
+    reason: Емаил '%s' уже существует
+    details:
+      - DDDDD1
+      - DDDDD2
+  authErrUserEmailAlreadyExists2:
+    reason: Емаил '%s' уже существует2
+    details:
+      - XXXXXXXXX1
+      - XXXXXXXXX2
+      - XXXXXXXXX3
+  authErrUserEmailAlreadyExists3:
+    reason: Емаил '%s' уже существует3
+    details: [ MMMMMMMMM ]
+  authErrUserEmailAlreadyExistsWithoutDetails:
+    reason: Емаил '%s' уже существует4
